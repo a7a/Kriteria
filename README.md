@@ -1,7 +1,5 @@
 # Kriteria
 
-- - -
-
 ## Usage
 
 ```javascript
@@ -12,7 +10,11 @@ kri.match({ key1: 200 }); // -> false
 var matcher = kri.matcher();
 matcher({ key1: 100 }); // -> true
 matcher({ key1: 200 }); // -> false
+```
 
+### Methods
+
+```javascript
 new Kriteria()
   .and(key_name)
   .or(key_name)
@@ -33,7 +35,34 @@ new Kriteria()
     .not_in.value(value1[, vlaue2 ...])
            .key(key_name)
     .between(value1, value2)
+    .match(value|regexp)
   .not()
+```
+
+### Multiple Conditions
+
+```javascript
+var kri = new Kriteria();
+kri.and("key1").eq.value(100)
+   .and("key2").eq.value(200);
+```
+
+### Nested Condition
+
+```javascript
+var kri1 = new Kriteria(),
+    kri2 = new Kriteria(),
+    kri3 = new Kriteria();
+kri1.or(kri2).or(kri3);
+```
+
+or
+
+```javascript
+var kri = new Kriteria();
+kri.or(function($) { // $ is Kriteria instance
+  $.and("key1").eq.value(100);
+});
 ```
 
 ## Licence

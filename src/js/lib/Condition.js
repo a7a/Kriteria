@@ -78,6 +78,15 @@
       case "not_between":
         this.operator = "between";
         break;
+
+      case "match":
+        this.operator = "not_match";
+        break;
+
+      case "not_match":
+        this.operator = "match";
+        break;
+
     }
 
     return this;

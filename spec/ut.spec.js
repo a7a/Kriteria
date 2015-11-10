@@ -13,7 +13,9 @@ describe('test1 - Kriteria.js', function() {
     "in": "not_in",
     "not_in": "in",
     "between": "not_between",
-    "not_between": "between"
+    "not_between": "between",
+    "match": "not_match",
+    "not_match": "match"
   };
   var normalize_operator = {
     "eq": ["eq"],
@@ -25,11 +27,14 @@ describe('test1 - Kriteria.js', function() {
     "in": ["eq"],
     "not_in": ["ne"],
     "between": ["between"],
-    "not_between": ["lt", "gt"]
+    "not_between": ["lt", "gt"],
+    "match": ["match"],
+    "not_match": ["not_match"]
   };
 
+/*
 
-  it("101 - Condiiton eq", function(done) {
+  it("101 - Condition eq", function(done) {
     var test = {
       left_key: "key1",
       operator: "eq",
@@ -119,7 +124,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("103 - Condiiton lt", function(done) {
+  it("103 - Condition lt", function(done) {
     var test = {
       left_key: "key1",
       operator: "lt",
@@ -164,7 +169,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("104 - Condiiton le", function(done) {
+  it("104 - Condition le", function(done) {
     var test = {
       left_key: "key1",
       operator: "le",
@@ -209,7 +214,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("105 - Condiiton gt", function(done) {
+  it("105 - Condition gt", function(done) {
     var test = {
       left_key: "key1",
       operator: "gt",
@@ -254,7 +259,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("106 - Condiiton ge", function(done) {
+  it("106 - Condition ge", function(done) {
     var test = {
       left_key: "key1",
       operator: "ge",
@@ -299,7 +304,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("107 - Condiiton in", function(done) {
+  it("107 - Condition in", function(done) {
     var test = {
       left_key: "key1",
       operator: "in",
@@ -344,7 +349,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("108 - Condiiton not_in", function(done) {
+  it("108 - Condition not_in", function(done) {
     var test = {
       left_key: "key1",
       operator: "not_in",
@@ -389,7 +394,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("109 - Condiiton between", function(done) {
+  it("109 - Condition between", function(done) {
     var test = {
       left_key: "key1",
       operator: "between",
@@ -448,7 +453,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it("110 - Condiiton not_between", function(done) {
+  it("110 - Condition not_between", function(done) {
     var test = {
       left_key: "key1",
       operator: "not_between",
@@ -489,6 +494,76 @@ describe('test1 - Kriteria.js', function() {
     expect(cond4.right_key).toEqual(test.right_key);
     expect(cond4.key_type).toEqual(test.key_type);
     expect(cond4.criteria).toEqual(test.criteria);
+
+    done();
+  });
+
+  if("111 - Condition match", function(done) {
+    var test = {
+      left_key: "key1",
+      operator: "match",
+      right_key: ["key2"],
+      key_type: "value",
+      criteria: null};
+    var cond = new Condition(
+      test.left_key, test.operator, test.right_key, test.key_type, test.criteria
+    ),
+        cond1 = cond.clone(),
+        cond2 = cond.clone().not(),
+        cond3 = cond.normalize(),
+        cond4 = cond.clone().not().not();
+
+    expect(cond1.left_key).toEqual(test.left_key);
+    expect(cond1.operator).toEqual(test.operator);
+    expect(cond1.right_key).toEqual(test.right_key);
+    expect(cond1.key_type).toEqual(test.key_type);
+    expect(cond1.criteria).toEqual(test.criteria);
+
+    expect(cond2.left_key).toEqual(test.left_key);
+    expect(cond2.operator).toEqual(not_operator[test.operator]);
+    expect(cond2.right_key).toEqual(test.right_key);
+    expect(cond2.key_type).toEqual(test.key_type);
+    expect(cond2.criteria).toEqual(test.criteria);
+
+    for(var i = 0, l = cond3.length; i < l; i = i + 1) {
+      expect(cond3[i].left_key).toEqual(test.left_key);
+      expect(cond3[i].operator).toEqual(normalize_operator[test.operator][i]);
+      expect(cond3[i].right_key).toEqual([test.right_key[i]]);
+      expect(cond3[i].key_type).toEqual(test.key_type);
+      expect(cond3[i].criteria).toEqual(test.criteria);
+    }
+
+    expect(cond4.left_key).toEqual(test.left_key);
+    expect(cond4.operator).toEqual(test.operator);
+    expect(cond4.right_key).toEqual(test.right_key);
+    expect(cond4.key_type).toEqual(test.key_type);
+    expect(cond4.criteria).toEqual(test.criteria);
+
+    done();
+  });
+
+  it('201 - ', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: true,
+        data: { t1: { key1: 100 },
+                t2: { key1: 100 }
+              }
+      },
+      { result: false,
+        data: { t1: { key1: 100 },
+                t2: { key1: 200 }
+              }
+      }
+    ];
+
+    cri.and("t1.key1").eq.key("t2.key1");
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i = i + 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
 
     done();
   });
@@ -947,7 +1022,7 @@ describe('test1 - Kriteria.js', function() {
     done();
   });
 
-  it('011 - and key lt .value 100', function(done) {
+  it('011 - and key lt value 100', function(done) {
     var cri = new Kriteria();
     var test = [
       { result: true,
@@ -2018,6 +2093,277 @@ describe('test1 - Kriteria.js', function() {
     ];
 
     cri.and("ns1.key1").eq.key("ns1.key2");
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+*/
+
+//  it('050 - and key match value 0', function(done) {
+//    var cri = new Kriteria();
+//    var test = [
+//      { result: true,
+//        data: { key: 0 }
+//      },
+//      { result: false,
+//        data: { key: 1 }
+//      },
+//      { result: false,
+//        data: { key1: 0 }
+//      },
+//      { result: false,
+//        data: { key: null }
+//      },
+//      { result: false,
+//        data: { key: void 0 }
+//      },
+//      { result: false,
+//        data: {}
+//      }
+//    ];
+//
+//    cri.and("key").match.value(0);
+//    var matcher = cri.matcher();
+//
+//    for(var i = 0, l = test.length; i < l; i += 1) {
+//      expect(cri.match(test[i].data)).toEqual(test[i].result);
+//      expect(matcher(test[i].data)).toEqual(test[i].result);
+//    }
+//
+//    cri.not();
+//    matcher = cri.matcher();
+//
+//    for(var i = 0, l = test.length; i < l; i += 1) {
+//      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+//      expect(matcher(test[i].data)).toEqual(!test[i].result);
+//    }
+//
+//    done();
+//  });
+
+  it('051 - and key match ""', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: true,
+        data: { key: "" }
+      },
+      { result: true,
+        data: { key: "a" }
+      },
+      { result: true,
+        data: { key: 0 }
+      },
+      { result: false,
+        data: { key1: "" }
+      },
+      { result: false,
+        data: { key: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").match("");
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  it('052 - and key match "a"', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: true,
+        data: { key: "a" }
+      },
+      { result: false,
+        data: { key: "b" }
+      },
+      { result: false,
+        data: { key: "" }
+      },
+      { result: false,
+        data: { key1: "a" }
+      },
+      { result: false,
+        data: { key: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").match("a");
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  if('053 - and key match /^abc/', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: true,
+        data: { key: "abcd" }
+      },
+      { result: true,
+        data: { key: "abc" }
+      },
+      { result: false,
+        data: { key: "aabc" }
+      },
+      { result: false,
+        data: { key: "" }
+      },
+      { result: false,
+        data: { key: 0 }
+      },
+      { result: false,
+        data: { key1: "abc" }
+      },
+      { result: false,
+        data: { key: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").match(/^abc/);
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  it('054 - and key match null', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: true,
+        data: { key: null }
+      },
+      { result: false,
+        data: { key: "null" }
+      },
+      { result: false,
+        data: { key: 0 }
+      },
+      { result: false,
+        data: { key: 1 }
+      },
+      { result: false,
+        data: { key1: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").match(null);
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  it('055 - and key match undefined', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: false,
+        data: { key: undefined }
+      },
+      { result: false,
+        data: { key: 0 }
+      },
+      { result: false,
+        data: { key: 1 }
+      },
+      { result: false,
+        data: { key1: undefined }
+      },
+      { result: false,
+        data: { key: null }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").match(undefined);
     var matcher = cri.matcher();
 
     for(var i = 0, l = test.length; i < l; i += 1) {

@@ -75,12 +75,13 @@
   /**
   * @public
   * @function
-  * @param {String} key - key anme
+  * @param {Mixed(String|Kriteria|Function)} key - key name or Kriteria instance or Kriteria reqired function
   * @returns {Function} evaluation || {Kriteria}
   * @description
   */
   Kriteria.prototype.and = function and(key) {
-    var key_type = typeof key;
+    var key_type = typeof key,
+        cri = null;
 
     if(
       key_type === "string" ||
@@ -91,7 +92,15 @@
       return evaluation("and", key, this);
 
     } else if(key instanceof Kriteria) {
-      this.addAnd(new Condition("", "", [], "", key));
+      cri = key;
+      this.addAnd(new Condition("", "", [], "", cri));
+
+      return this;
+
+    } else if(typeof key === "function") {
+      cri = new Kriteria();
+      key(cri);
+      this.addAnd(new Condition("", "", [], "", cri));
 
       return this;
 
@@ -103,18 +112,31 @@
   /**
   * @public
   * @function
-  * @param {String} key - key anme
+  * @param {Mixed(String|Kriteria|Function)} key - key name or Kriteria instance or Kriteria reqired function
   * @returns {Function} evaluation || {Kriteria}
   * @description
   */
   Kriteria.prototype.or = function or(key) {
-    var key_type = typeof key;
+    var key_type = typeof key,
+        cri = null;
 
-    if(key_type === "string" || key_type === "number") {
+    if(key_type === "string" ||
+       key instanceof String ||
+       key_type === "number" ||
+       key instanceof Number
+      ) {
       return evaluation("or", key, this);
 
     } else if(key instanceof Kriteria) {
-      this.addOr(new Condition("", "", [], "", key));
+      cri = key;
+      this.addOr(new Condition("", "", [], "", cri));
+
+      return this;
+
+    } else if(typeof key === "function") {
+      cri = new Kriteria();
+      key(cri);
+      this.addOr(new Condition("", "", [], "", cri));
 
       return this;
 
@@ -169,12 +191,13 @@
   */
   Kriteria.prototype.match = function match(data) {
     var i = 0, l = 0,
+        j = 0, l2 = 0,
         left_key = "",
         operator = "",
         right_key = [],
         key_type = "",
         left_value = null,
-        right_value = null,
+        right_value = [],
         result = false,
         condition = null,
         tmp = null;
@@ -199,13 +222,34 @@
 
         if(key_type === "value") {
           right_value = right_key;
+
         } else if(key_type === "key") {
           tmp = getProperty(data, right_key[0]);
 
           if(Array.isArray(tmp)) {
-            right_value = tmp;
+            if(operator === "match" || operator === "not_match") {
+              right_value = [];
+              for(j = 0, l2 = tmp.length; j < l2; j = j + 1) {
+                if(tmp[j] !== null && tmp[j] !== void 0) {
+                  right_value[j] = new RegExp(tmp[j]);
+                } else {
+                  right_value[j] = tmp[j];
+                }
+              }
+            } else {
+              right_value = tmp;
+            }
+
           } else {
-            right_value = [tmp];
+            if(operator === "match" || operator === "not_match") {
+              if(tmp !== null && tmp !== void 0) {
+                right_value = [new RegExp(tmp)];
+              } else {
+                right_value = tmp;
+              }
+            } else {
+              right_value = [tmp];
+            }
           }
         }
 
@@ -236,6 +280,7 @@
         if(result) {
           return !!(true ^ this._not_flg);
         }
+
       } else {
         left_key = condition.left_key;
         operator = condition.operator;
@@ -245,12 +290,33 @@
 
         if(key_type === "value") {
           right_value = right_key;
+
         } else if(key_type === "key") {
           tmp = getProperty(data, right_key);
+
           if(Array.isArray(tmp)) {
-            right_value = tmp;
+            if(operator === "match" || operator === "not_match") {
+              right_value = [];
+              for(j = 0, l2 = tmp.length; j < l2; j = j + 1) {
+                if(tmp[j] !== null && tmp[j] !== void 0) {
+                  right_value[j] = new RegExp(tmp[j]);
+                } else {
+                  right_value[j] = tmp[j];
+                }
+              }
+            } else {
+              right_value = tmp;
+            }
           } else {
-            right_value = [tmp];
+            if(operator === "match" || operator === "not_match") {
+              if(tmp !== null && tmp !== void 0) {
+                right_value = [new RegExp(tmp)];
+              } else {
+                right_value = tmp;
+              }
+            } else {
+              right_value = [tmp];
+            }
           }
         }
 
@@ -314,6 +380,26 @@
       case "not_between":
         result = (value2[0] > value1 || value2[1] < value1);
         break;
+      case "match":
+        if(value2[0] === null) {
+          if(value1 === null || value1 === void 0) {
+            result = true;
+          } else {
+            result = false;
+          }
+        } else if(value1 === null) {
+          result = false;
+        } else {
+          result = value2[0].test(value1);
+        }
+        break;
+      case "not_match":
+        if(value1 === null) {
+          result = false;
+        } else {
+          result = value2[0].test(value1);
+        }
+        break;
     }
 
     return result;
@@ -326,6 +412,7 @@
   * @description
   */
   Kriteria.prototype.matcher = function matcher() {
+    /* eslint no-eval: 2 */
     return new Function("$", "return " + this.createMatchingExpression());
   };
 
@@ -446,6 +533,34 @@
       return left_key + " < " + this._toStringExpressionFromValue(right_key[0], key_type) +
              " || " +
              left_key + " > " + this._toStringExpressionFromValue(right_key[1], key_type);
+
+    } else if(operator === "match") {
+      if(key_type === "value") {
+        if(right_key[0] === void 0) {
+          return false;
+        } else if(right_key[0] === null) {
+          return "(" + left_key + " === null ? true : false)";
+        } else {
+          return "(" + left_key + " !== null && " + right_key[0] + ".test(" + left_key + "))";
+        }
+
+      } else {
+        throw new Error("invalid operation");
+      }
+
+    } else if(operator === "not_match") {
+      if(key_type === "value") {
+        if(right_key[0] === void 0) {
+          return false;
+        } else if(right_key[0] === null) {
+          return "(" + left_key + " === null ? false : true)";
+        } else {
+          return "!(" + left_key + " !== null && " + right_key[0] + ".test(" + left_key + "))";
+        }
+
+      } else {
+        throw new Error("invali operation");
+      }
 
     } else {
       return null;

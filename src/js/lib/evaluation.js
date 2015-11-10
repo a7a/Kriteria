@@ -103,6 +103,20 @@
       not_between: function(value1, value2) {
         _setToCriteria(criteria, type, "not_between", left_key, "value", [value1, value2]);
         return criteria;
+      },
+      match: function(value) {
+        var _value = value instanceof RegExp ? value :
+                     value === null ? null :
+                     value === void 0 ? void 0 : new RegExp(value);
+        _setToCriteria(criteria, type, "match", left_key, "value", [_value]);
+        return criteria;
+      },
+      not_match: function(value) {
+        var _value = value instanceof RegExp ? value :
+                     value === null ? null :
+                     value === void 0 ? void 0 : new RegExp(value);
+        _setToCriteria(criteria, type, "not_match", left_key, "value", [_value]);
+        return criteria;
       }
     };
   };
