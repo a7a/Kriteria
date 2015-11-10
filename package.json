@@ -1,7 +1,7 @@
 {
   "name": "Kriteria",
   "version": "0.2.0",
-  "description": "Kriteria",
+  "description": "JSON filtering module, to write to method chain.",
   "main": "dist/js/node/Kriteria.js",
   "repository": {
     "type": "git",
