@@ -1,5 +1,11 @@
 # Kriteria
 
+## Install
+
+```
+npm install kriteria
+```
+
 ## Usage
 
 ```javascript

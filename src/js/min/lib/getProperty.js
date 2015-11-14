@@ -1,1 +1,1 @@
-!function(t){"use strict";var n=function(t,n){for(var r=n.split("."),i=t,e=0,o=r.length;o>e;e+=1){if("string"==typeof i||i instanceof String||"number"==typeof i||i instanceof Number)return void 0;if(!(r[e]in i))return void 0;i=i[r[e]]}return i};t.getProperty=n}(this);
+!function(t){"use strict";var n=function(t,n){for(var r=n.split("."),e=t,i=0,f=r.length;f>i;i+=1){if("string"==typeof e||e instanceof String||"number"==typeof e||e instanceof Number)return;if(!(r[i]in e))return;e=e[r[i]]}return e};t.getProperty=n}(this);

@@ -230,7 +230,7 @@
             if(operator === "match" || operator === "not_match") {
               right_value = [];
               for(j = 0, l2 = tmp.length; j < l2; j = j + 1) {
-                if(tmp[j] !== null && tmp[j] !== void 0) {
+                if(tmp[j] !== null && tmp[j] !== void 0 && tmp !== "") {
                   right_value[j] = new RegExp(tmp[j]);
                 } else {
                   right_value[j] = tmp[j];
@@ -242,7 +242,7 @@
 
           } else {
             if(operator === "match" || operator === "not_match") {
-              if(tmp !== null && tmp !== void 0) {
+              if(tmp !== null && tmp !== void 0 && tmp !== "") {
                 right_value = [new RegExp(tmp)];
               } else {
                 right_value = tmp;
@@ -298,7 +298,7 @@
             if(operator === "match" || operator === "not_match") {
               right_value = [];
               for(j = 0, l2 = tmp.length; j < l2; j = j + 1) {
-                if(tmp[j] !== null && tmp[j] !== void 0) {
+                if(tmp[j] !== null && tmp[j] !== void 0 && tmp[j] !== "") {
                   right_value[j] = new RegExp(tmp[j]);
                 } else {
                   right_value[j] = tmp[j];
@@ -309,7 +309,7 @@
             }
           } else {
             if(operator === "match" || operator === "not_match") {
-              if(tmp !== null && tmp !== void 0) {
+              if(tmp !== null && tmp !== void 0 && tmp !== "") {
                 right_value = [new RegExp(tmp)];
               } else {
                 right_value = tmp;
@@ -353,33 +353,43 @@
       case "eq":
         result = (value2[0] === value1);
         break;
+
       case "ne":
         result = (value2[0] !== value1);
         break;
+
       case "lt":
         result = (value2[0] > value1);
         break;
+
       case "le":
         result = (value2[0] >= value1);
         break;
+
       case "gt":
         result = (value2[0] < value1);
         break;
+
       case "ge":
         result = (value2[0] <= value1);
         break;
+
       case "in":
         result = !!~value2.indexOf(value1);
         break;
+
       case "not_in":
         result = !~value2.indexOf(value1);
         break;
+
       case "between":
         result = (value2[0] <= value1 && value2[1] >= value1);
         break;
+
       case "not_between":
         result = (value2[0] > value1 || value2[1] < value1);
         break;
+
       case "match":
         if(value2[0] === null) {
           if(value1 === null || value1 === void 0) {
@@ -387,17 +397,34 @@
           } else {
             result = false;
           }
+
         } else if(value1 === null) {
           result = false;
+
+        } else if(value2[0] === "") {
+          result = value1 === "" ? true : false;
+
         } else {
           result = value2[0].test(value1);
         }
         break;
+
       case "not_match":
-        if(value1 === null) {
-          result = false;
+        if(value2[0] === null) {
+          if(value1 === null || value1 === void 0) {
+            result = false;
+          } else {
+            result = true;
+          }
+
+        } else if(value1 === null) {
+          result = true;
+
+        } else if(value2[0] === "") {
+          result = value1 === "" ? false : true;
+
         } else {
-          result = value2[0].test(value1);
+          result = !value2[0].test(value1);
         }
         break;
     }
@@ -535,31 +562,33 @@
              left_key + " > " + this._toStringExpressionFromValue(right_key[1], key_type);
 
     } else if(operator === "match") {
-      if(key_type === "value") {
-        if(right_key[0] === void 0) {
-          return false;
-        } else if(right_key[0] === null) {
-          return "(" + left_key + " === null ? true : false)";
-        } else {
-          return "(" + left_key + " !== null && " + right_key[0] + ".test(" + left_key + "))";
-        }
+      if(right_key[0] === void 0) {
+        return false;
+
+      } else if(right_key[0] === null) {
+        return "(" + left_key + " === null ? true : false)";
+
+      } else if(right_key[0] === "") {
+        return "(" + left_key + " === '' ? true : false)";
 
       } else {
-        throw new Error("invalid operation");
+        //return "(" + left_key + " !== null && " + right_key[0] + ".test(" + left_key + "))";
+        return "(" + right_key[0] + ".test(" + left_key + "))";
       }
 
     } else if(operator === "not_match") {
-      if(key_type === "value") {
-        if(right_key[0] === void 0) {
-          return false;
-        } else if(right_key[0] === null) {
-          return "(" + left_key + " === null ? false : true)";
-        } else {
-          return "!(" + left_key + " !== null && " + right_key[0] + ".test(" + left_key + "))";
-        }
+      if(right_key[0] === void 0) {
+        return false;
+
+      } else if(right_key[0] === null) {
+        return "(" + left_key + " === null ? false : true)";
+
+      } else if(right_key[0] === "") {
+        return "(" + left_key + " === '' ? false : true)";
 
       } else {
-        throw new Error("invali operation");
+        //return "(" + left_key + " !== null && !" + right_key[0] + ".test(" + left_key + "))";
+        return "(!" + right_key[0] + ".test(" + left_key + "))";
       }
 
     } else {

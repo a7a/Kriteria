@@ -107,14 +107,16 @@
       match: function(value) {
         var _value = value instanceof RegExp ? value :
                      value === null ? null :
-                     value === void 0 ? void 0 : new RegExp(value);
+                     value === void 0 ? void 0 :
+                     value === "" ? "" : new RegExp(value);
         _setToCriteria(criteria, type, "match", left_key, "value", [_value]);
         return criteria;
       },
       not_match: function(value) {
         var _value = value instanceof RegExp ? value :
                      value === null ? null :
-                     value === void 0 ? void 0 : new RegExp(value);
+                     value === void 0 ? void 0 :
+                     value === "" ? "" : new RegExp(value);
         _setToCriteria(criteria, type, "not_match", left_key, "value", [_value]);
         return criteria;
       }

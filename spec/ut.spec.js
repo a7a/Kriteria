@@ -32,7 +32,7 @@ describe('test1 - Kriteria.js', function() {
     "not_match": ["not_match"]
   };
 
-/*
+
 
   it("101 - Condition eq", function(done) {
     var test = {
@@ -2110,49 +2110,48 @@ describe('test1 - Kriteria.js', function() {
 
     done();
   });
-*/
 
-//  it('050 - and key match value 0', function(done) {
-//    var cri = new Kriteria();
-//    var test = [
-//      { result: true,
-//        data: { key: 0 }
-//      },
-//      { result: false,
-//        data: { key: 1 }
-//      },
-//      { result: false,
-//        data: { key1: 0 }
-//      },
-//      { result: false,
-//        data: { key: null }
-//      },
-//      { result: false,
-//        data: { key: void 0 }
-//      },
-//      { result: false,
-//        data: {}
-//      }
-//    ];
-//
-//    cri.and("key").match.value(0);
-//    var matcher = cri.matcher();
-//
-//    for(var i = 0, l = test.length; i < l; i += 1) {
-//      expect(cri.match(test[i].data)).toEqual(test[i].result);
-//      expect(matcher(test[i].data)).toEqual(test[i].result);
-//    }
-//
-//    cri.not();
-//    matcher = cri.matcher();
-//
-//    for(var i = 0, l = test.length; i < l; i += 1) {
-//      expect(cri.match(test[i].data)).toEqual(!test[i].result);
-//      expect(matcher(test[i].data)).toEqual(!test[i].result);
-//    }
-//
-//    done();
-//  });
+  it('050 - and key match value 0', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: true,
+        data: { key: 0 }
+      },
+      { result: false,
+        data: { key: 1 }
+      },
+      { result: false,
+        data: { key1: 0 }
+      },
+      { result: false,
+        data: { key: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").match(0);
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
 
   it('051 - and key match ""', function(done) {
     var cri = new Kriteria();
@@ -2160,10 +2159,10 @@ describe('test1 - Kriteria.js', function() {
       { result: true,
         data: { key: "" }
       },
-      { result: true,
+      { result: false,
         data: { key: "a" }
       },
-      { result: true,
+      { result: false,
         data: { key: 0 }
       },
       { result: false,
@@ -2364,6 +2363,278 @@ describe('test1 - Kriteria.js', function() {
     ];
 
     cri.and("key").match(undefined);
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+
+
+  it('056 - and key not_match value 0', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: false,
+        data: { key: 0 }
+      },
+      { result: true,
+        data: { key: 1 }
+      },
+      { result: false,
+        data: { key1: 0 }
+      },
+      { result: true,
+        data: { key: null }
+      },
+      { result: false,
+       data: { key: void 0 }
+      },
+      { result: false,
+       data: {}
+      }
+    ];
+
+    cri.and("key").not_match(0);
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  it('057 - and key not_match ""', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: false,
+        data: { key: "" }
+      },
+      { result: true,
+        data: { key: "a" }
+      },
+      { result: true,
+        data: { key: 0 }
+      },
+      { result: false,
+        data: { key1: "" }
+      },
+      { result: true,
+        data: { key: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+       data: {}
+      }
+    ];
+
+    cri.and("key").not_match("");
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  it('058 - and key not_match "a"', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: false,
+        data: { key: "a" }
+      },
+      { result: true,
+        data: { key: "b" }
+      },
+      { result: true,
+        data: { key: "" }
+      },
+      { result: false,
+        data: { key1: "a" }
+      },
+      { result: true,
+        data: { key: null }
+      },
+      { result: false,
+       data: { key: void 0 }
+      },
+      { result: false,
+       data: {}
+      }
+    ];
+
+    cri.and("key").not_match("a");
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  if('059 - and key not_match /^abc/', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: false,
+        data: { key: "abcd" }
+      },
+      { result: false,
+       data: { key: "abc" }
+      },
+      { result: true,
+       data: { key: "aabc" }
+      },
+      { result: true,
+       data: { key: "" }
+      },
+      { result: true,
+       data: { key: 0 }
+      },
+      { result: false,
+       data: { key1: "abc" }
+      },
+      { result: true,
+        data: { key: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").not_match(/^abc/);
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  it('060 - and key not_match null', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: false,
+        data: { key: null }
+      },
+      { result: true,
+        data: { key: "null" }
+      },
+      { result: true,
+        data: { key: 0 }
+      },
+      { result: true,
+        data: { key: 1 }
+      },
+      { result: false,
+       data: { key1: null }
+      },
+      { result: false,
+        data: { key: void 0 }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").not_match(null);
+    var matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(test[i].result);
+      expect(matcher(test[i].data)).toEqual(test[i].result);
+    }
+
+    cri.not();
+    matcher = cri.matcher();
+
+    for(var i = 0, l = test.length; i < l; i += 1) {
+      expect(cri.match(test[i].data)).toEqual(!test[i].result);
+      expect(matcher(test[i].data)).toEqual(!test[i].result);
+    }
+
+    done();
+  });
+
+  it('061 - and key not_match undefined', function(done) {
+    var cri = new Kriteria();
+    var test = [
+      { result: false,
+        data: { key: undefined }
+      },
+      { result: false,
+        data: { key: 0 }
+      },
+      { result: false,
+        data: { key: 1 }
+      },
+      { result: false,
+        data: { key1: undefined }
+      },
+      { result: false,
+        data: { key: null }
+      },
+      { result: false,
+        data: {}
+      }
+    ];
+
+    cri.and("key").not_match(undefined);
     var matcher = cri.matcher();
 
     for(var i = 0, l = test.length; i < l; i += 1) {
