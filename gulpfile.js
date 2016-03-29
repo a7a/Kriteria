@@ -4,6 +4,8 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var browserSync = require('browser-sync');
 var runSequence = require('run-sequence');
+var Jasmine = require('jasmine');
+var SpecReporter = require('jasmine-spec-reporter');
 
 gulp.task('js-clean', function() {
   return gulp.src('dist/js/*').pipe($.clean());
@@ -52,7 +54,10 @@ gulp.task('js-dist-node', function() {
 });
 gulp.task('spec', function() {
   return gulp.src('spec/*.js')
-  .pipe($.jasmine());
+  //.pipe($.jasmine());
+  .pipe($.jasmine({
+    reporter: new SpecReporter()
+  }));
 });
 
 //gulp.task('js-browser', function() {

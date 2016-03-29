@@ -8,7 +8,7 @@
   * @class
   * @param {String} left_key -
   * @param {String} operator -
-  * @param {Array<String>} right_key -
+  * @param {Mixed(Array<any>|any)} right_key -
   * @param {String} key_type -
   * @param {Kriteria} criteria
   * @description
@@ -16,7 +16,8 @@
   var Condition = function Condition(left_key, operator, right_key, key_type, criteria) {
     this.left_key = left_key;
     this.operator = operator;
-    this.right_key = right_key;
+    this.right_key = (Array.isArray(right_key) || right_key === void 0 || right_key === null) ?
+      right_key : [right_key];
     this.key_type = key_type;
     this.criteria = criteria;
   };
@@ -149,6 +150,55 @@
     return ret;
   };
 
+  /**
+  * @public
+  * @function
+  * @param {Condition} cond -
+  * @returns {Number}
+  *    0 - equal
+  *    1 - greater
+  *   -1 - less
+  */
+  Condition.prototype.compareTo = function compareTo(cond) {
+    if(this.criteria && !cond.criteria) {
+      return 1;
+
+    } else if(!this.criteria && cond.criteria) {
+      return -1;
+
+    } else if(this.criteria && cond.criteria) {
+      return this.criteria.compareTo(cond.criteria);
+
+    } else if(this.left_key > cond.left_key) {
+      return 1;
+
+    } else if(this.left_key < cond.left_key) {
+      return -1;
+
+    } else if(this.operator > cond.operator) {
+      return 1;
+
+    } else if(this.operator < cond.operator) {
+      return -1;
+
+    } else if(this.key_type > cond.key_type) {
+      return 1;
+
+    } else if(this.key_type < cond.key_type) {
+      return -1;
+
+    } else {
+      for(var i = 0, l = this.right_key.length; i < l; i = i + 1) {
+        if(this.right_key[i] > cond.right_key[i]) {
+          return 1;
+        } else if(this.right_key[i] < cond.right_key[i]) {
+          return -1;
+        }
+      }
+
+      return 0;
+    }
+  };
 
   cxt.Condition = Condition;
 
