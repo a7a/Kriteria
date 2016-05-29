@@ -1,6 +1,6 @@
 {
   "name": "kriteria",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "JSON filtering module, to write to method chain",
   "main": "dist/js/node/Kriteria.js",
   "directories": {
@@ -8,10 +8,10 @@
   },
   "devDependencies": {
     "browser-sync": "^1.9.2",
+    "browserify": "^13.0.1",
+    "del": "^2.2.0",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^2.3.1",
-    "gulp-browserify": "^0.5.1",
-    "gulp-clean": "^0.3.1",
     "gulp-cssmin": "^0.1.7",
     "gulp-eslint": "^0.11.1",
     "gulp-jasmine": "^2.0.1",
@@ -22,7 +22,8 @@
     "jasmine": "^2.4.1",
     "jasmine-node": "^1.14.5",
     "jasmine-spec-reporter": "^2.4.0",
-    "run-sequence": "^1.1.5"
+    "run-sequence": "^1.1.5",
+    "vinyl-source-stream": "^1.1.0"
   },
   "scripts": {
     "build": "gulp build",

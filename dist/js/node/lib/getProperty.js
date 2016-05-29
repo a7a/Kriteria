@@ -1,1 +1,32 @@
-!function(t){"use strict";var n=function(t,n){for(var r=n.split("."),e=t,i=0,f=r.length;f>i;i+=1){if("string"==typeof e||e instanceof String||"number"==typeof e||e instanceof Number)return;if(!(r[i]in e))return;e=e[r[i]]}return e};t.getProperty=n}(this);
+/* getProperty.js */
+
+(function (cxt) {
+  'use strict';
+
+  var getProperty = function getProperty(obj, key) {
+    var keys = key.split('.'),
+        ret = obj;
+
+    for(var i = 0, l = keys.length; i < l; i += 1) {
+      if(
+        typeof ret === "string" ||
+        ret instanceof String ||
+        typeof ret === "number" ||
+        ret instanceof Number
+      ) {
+        return void 0;
+
+      } else if(keys[i] in ret) {
+        ret = ret[keys[i]];
+
+      } else {
+        return void 0;
+      }
+    }
+
+    return ret;
+  };
+
+  cxt.getProperty = getProperty;
+
+})(this);

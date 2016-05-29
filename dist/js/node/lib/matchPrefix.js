@@ -1,1 +1,30 @@
-!function(r){"use strict";var t=function(r,t){if(0===t.length)return!0;for(var n=0,e=t.length;e>n;n+=1)if(0===r.indexOf(t[n]+"."))return!0;return!1};r.matchPrefix=t}(this);
+/* matchPrefix.js */
+
+(function(cxt) {
+  "use strict";
+
+  /**
+  * @public
+  * @function
+  * @param {String} str -
+  * @param {String[]} prefixes -
+  * @returns {Boolean}
+  */
+  var matchPrefix = function matchPrefix(str, prefixes) {
+    if(prefixes.length === 0) {
+      return true;
+    }
+
+    for(var i = 0, l = prefixes.length; i < l; i = i + 1) {
+      if(str.indexOf(prefixes[i] + ".") === 0) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+
+  cxt.matchPrefix = matchPrefix;
+
+}(this));

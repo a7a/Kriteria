@@ -1,11 +1,1509 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-!function(t){"use strict";var n=require("./lib/getProperty.js").getProperty,e=require("./lib/matchPrefix.js").matchPrefix,i=require("./lib/Condition.js").Condition,r=require("./lib/evaluation.js").evaluation,o=function(){this._conditionAnd=[],this._conditionOr=[],this._not_flg=!1};o._name_="Kriteria",o.prototype.getConditionAnd=function(){return this._conditionAnd},o.prototype.getConditionOr=function(){return this._conditionOr},o._JS_OPERATOR={eq:"===",ne:"!==",lt:"<",le:"<=",gt:">",ge:">="},o.prototype.addAnd=function(t){this._conditionAnd[this._conditionAnd.length]=t},o.prototype.addOr=function(t){this._conditionOr[this._conditionOr.length]=t},o.prototype.and=function(t){var n=typeof t,e=null;if("string"===n||t instanceof String||"number"===n||t instanceof Number)return r("and",t,this);if(t instanceof o)return e=t,this.addAnd(new i("","",[],"",e)),this;if("function"==typeof t)return e=new o,t(e),this.addAnd(new i("","",[],"",e)),this;throw new Error("invalid type of argument. ("+n+")")},o.prototype.or=function(t){var n=typeof t,e=null;if("string"===n||t instanceof String||"number"===n||t instanceof Number)return r("or",t,this);if(t instanceof o)return e=t,this.addOr(new i("","",[],"",e)),this;if("function"==typeof t)return e=new o,t(e),this.addOr(new i("","",[],"",e)),this;throw new Error("invalid type of argument. ("+n+")")},o.prototype.not=function(){return this._not_flg=!this._not_flg,this},o.parse=function(t){var n=new o,e="";for(e in t.and)n.addAnd(t.and[e]);for(e in t.or)n.andOr(t.or[e]);return t.not&&n.not(),n},o.prototype.match=function(t){var e=0,i=0,r=0,s=0,a="",l="",f=[],h="",c=null,d=[],_=!1,u=null,g=null;for(e=0,i=this._conditionAnd.length;i>e;e+=1)if(u=this._conditionAnd[e],u.criteria instanceof o){if(_=u.criteria.match(t),!_)break}else{if(a=u.left_key,l=u.operator,f=u.right_key,h=u.key_type,c=n(t,a),"value"===h)d=f;else if("key"===h)if(g=n(t,f[0]),Array.isArray(g))if("match"===l||"not_match"===l)for(d=[],r=0,s=g.length;s>r;r+=1)null===g[r]||void 0===g[r]||""===g[r]?d[r]=g[r]:d[r]=new RegExp(g[r]);else d=g;else d="match"===l||"not_match"===l?null===g||void 0===g||""===g?g:[new RegExp(g)]:[g];if(_=void 0===d||~d.indexOf(void 0)||void 0===c?!1:this._compare(c,l,d),!_)break}if(_)return!!(!0^this._not_flg);for(e=0,i=this._conditionOr.length;i>e;e+=1)if(u=this._conditionOr[e],u.criteria instanceof o){if(_=u.criteria.match(t))return!!(!0^this._not_flg)}else{if(a=u.left_key,l=u.operator,f=u.right_key,h=u.key_type,c=n(t,a),"value"===h)d=f;else if("key"===h)if(g=n(t,f[0]),Array.isArray(g))if("match"===l||"not_match"===l)for(d=[],r=0,s=g.length;s>r;r+=1)null===g[r]||void 0===g[r]||""===g[r]?d[r]=g[r]:d[r]=new RegExp(g[r]);else d=g;else d="match"===l||"not_match"===l?null===g||void 0===g||""!==g?g:[new RegExp(g)]:[g];if(_=void 0===d||~d.indexOf(void 0)||void 0===c?!1:this._compare(c,l,d))return!!(!0^this._not_flg)}return!!(!1^this._not_flg)},o.prototype._compare=function(t,n,e){var i=!1;switch(n){case"eq":i=e[0]===t;break;case"ne":i=e[0]!==t;break;case"lt":i=e[0]>t;break;case"le":i=e[0]>=t;break;case"gt":i=e[0]<t;break;case"ge":i=e[0]<=t;break;case"in":i=!!~e.indexOf(t);break;case"not_in":i=!~e.indexOf(t);break;case"between":i=e[0]<=t&&e[1]>=t;break;case"not_between":i=e[0]>t||e[1]<t;break;case"match":i=null===e[0]?null===t||void 0===t?!0:!1:null===t?!1:""===e[0]?""===t?!0:!1:e[0].test(t);break;case"not_match":i=null===e[0]?null===t||void 0===t?!1:!0:null===t?!0:""===e[0]?""===t?!1:!0:!e[0].test(t)}return i},o.prototype.matcher=function(){return new Function("$","return "+this._createMatchingExpression())},o.prototype._createMatchingExpression=function(){var t=0,n=0,e=[],i=[],r="",s="",a=null,l="";for(t=0,n=this._conditionAnd.length;n>t;t+=1)a=this._conditionAnd[t],a.criteria instanceof o?e[e.length]="("+a.criteria._createMatchingExpression()+")":e[e.length]=this._createExpression(a);for(t=0,n=this._conditionOr.length;n>t;t+=1)a=this._conditionOr[t],a.criteria instanceof o?i[i.length]="("+a.criteria._createMatchingExpression()+")":i[i.length]=this._createExpression(a);return r=e.join(" && "),s=i.join(" || "),r&&s?l=r+" || "+s+" ":s?r||(l=s):l=r,this._not_flg&&(l="!("+l+")"),l},o.prototype._createExpression=function(t){return"("+this._createJsExpressionOfKeyIsNotUndefined(t.left_key)+" && "+("key"===t.key_type?this._createJsExpressionOfKeyIsNotUndefined(t.right_key[0])+" && ":"")+this._createJsExpression(t)+")"},o.prototype._createJsExpression=function(t){var n="$."+t.left_key,e=t.operator,i=t.right_key,r=t.key_type,s=o._JS_OPERATOR[e];return s?n+" "+s+" "+this._toStringExpressionFromValue(i[0],r):"in"===e?"value"===r?"!!~"+this._toStringExpressionFromArray(i)+".indexOf("+n+")":"(Array.isArray($."+i[0]+") ? !!~$."+i[0]+".indexOf("+n+"): $."+i[0]+" === "+n+")":"not_in"===e?"value"===r?"!~"+this._toStringExpressionFromArray(i)+".indexOf("+n+")":"(Array.isArray($."+i[0]+") ? !~$."+i[0]+".indexOf("+n+"): $."+i[0]+" !== "+n+")":"between"===e?n+" >= "+this._toStringExpressionFromValue(i[0],r)+" && "+n+" <= "+this._toStringExpressionFromValue(i[1],r):"not_between"===e?n+" < "+this._toStringExpressionFromValue(i[0],r)+" || "+n+" > "+this._toStringExpressionFromValue(i[1],r):"match"===e?void 0===i[0]?!1:null===i[0]?"("+n+" === null ? true : false)":""===i[0]?"("+n+" === '' ? true : false)":"("+i[0]+".test("+n+"))":"not_match"===e?void 0===i[0]?!1:null===i[0]?"("+n+" === null ? false : true)":""===i[0]?"("+n+" === '' ? false : true)":"(!"+i[0]+".test("+n+"))":null},o.prototype._createJsExpressionOfKeyIsNotUndefined=function(t){for(var n=t.split("."),e=[],i=[],r=0,o=n.length;o>r;r+=1)e[e.length]=n[r],i[i.length]="$."+e.join(".")+" !== void 0";return i.join(" && ")},o.prototype._createJSExpressionOfKeyIsUndefined=function(t){for(var n=t.split("."),e=[],i=[],r=0,o=n.length;o>r;r+=1)e[e.length]=n[r],i[i.length]="$."+e.join(".")+" === void 0",i[i.length]="$."+e.join(".")+" === null";return i.join(" || ")},o.prototype._toStringExpressionFromArray=function(t){for(var n=[],e=0,i=t.length;i>e;e+=1)n[n.length]=this._toStringExpressionFromValue(t[e],"value");return"["+n.join(", ")+"]"},o.prototype._toStringExpressionFromValue=function(t,n){return"value"===n&&("string"==typeof t||t instanceof String)?'"'+t+'"':"key"===n?"$."+t:t+""},o.prototype.splitByKeyPrefixes=function(t){if(!Array.isArray(t)||0===t.length)return null;var n={},i=null,r=null,s=[],a="",l="",f="",h=!0,c=!0,d=!0,_="",u=0,g=0,p=0,y=0;for(u=0,g=t.length;g>u;u+=1)n[t[u]]=new o;for(n["else"]=new o,u=0,g=this._conditionAnd.length;g>u;u+=1)if(i=this._conditionAnd[u],i.criteria instanceof o){r=i.criteria.splitByKeyPrefixes(t);for(_ in r)null!==r[_]&&n[_].and(r[_])}else{for(s=[],a=i.left_key,l=i.right_key[0],f=i.key_type,d=!1,p=0,y=t.length;y>p;p+=1)if(s[s.length]=t[p],h=e(a,s),"key"===f&&(c=e(l,s)),"value"===f&&h||"key"===f&&h&&c){n[t[p]].addAnd(i),d=!0;break}d||n["else"].addAnd(i)}for(u=0,g=this._conditionOr.length;g>u;u+=1)if(i=this._conditionOr[u],i.criteria instanceof o){r=i.criteria.splitByKeyPrefixes(t);for(_ in r)null!==r[_]&&n[_].or(r[_])}else{for(s=[],a=i.left_key,l=i.right_key[0],f=i.key_type,d=!1,p=0,y=t.length;y>p;p+=1)if(s[s.length]=t[p],h=e(a,s),"key"===f&&(c=e(l,s)),"value"===f&&h||"key"===f&&h&&c){n[t[p]].addOr(i),d=!0;break}d||n["else"].addOr(i)}for(_ in n)n[_].getConditionAnd().length>0||n[_].getConditionOr().length>0?n[_]._not_flg=this._not_flg:n[_]=null;return n},o.prototype.merge=function(t,n){var e=new o,i=t.getConditionAnd(),r=t.getConditionOr(),s=null,a=!1,l=0,f=0,h=0,c=0;if(this._not_flg!==t._not_flg)throw new Error("Kriteria#merge - collision to not flag.");for(l=0,f=this._conditionAnd.length;f>l;l+=1)e.addAnd(this._conditionAnd[l]);for(l=0,f=this._conditionOr.length;f>l;l+=1)e.addOr(this._conditionOr[l]);if(n){for(l=0,f=i.length;f>l;l+=1){for(s=i[l],a=!1,h=0,c=this._conditionAnd.length;c>h;h+=1)if(0===s.compareTo(this._conditionAnd[h])){a=!0;break}a||e.addAnd(s)}for(l=0,f=r.length;f>l;l+=1){for(s=r[l],a=!1,h=0,c=this._conditionOr.length;c>h;h+=1)if(0===s.compareTo(this._conditionOr[h])){a=!0;break}a||e.addOr(s)}}else{for(l=0,f=i.length;f>l;l+=1)e.addAnd(i[l]);for(l=0,f=r.length;f>l;l+=1)e.addOr(r[l])}return e},o.prototype.compareTo=function(t){var n=function(t,n){return t.compareTo(n)},e=t.getConditionAnd(),i=t.getConditionOr(),r=null,o=null,s=!0,a=0,l=0,f=0,h=0;if(this._conditionAnd.sort(n),e.sort(n),this._conditionOr.sort(n),i.sort(n),this._not_flg&&!t._not_flg)return-1;if(!this._not_flg&&t._not_flg)return 1;for(a=this._conditionAnd.length,l=e.length,h=a>l?a:l,f=0;h>f;f+=1){if(r=this._conditionAnd[f],o=e[f],!r)return-1;if(!o)return 1;if(s=r.compareTo(o),0!==s)return s}for(a=this._conditionOr.length,l=i.length,h=a>l?a:l,f=0;h>f;f+=1){if(r=this._conditionOr[f],o=i[f],!r)return-1;if(!o)return 1;if(s=r.compareTo(o),0!==s)return s}return 0},o.prototype.removePrefixes=function(t){var n=null,e=null,i=0,r=0;if(null===t||void 0===t||!Array.isArray(t)||0===t.length)return this;for(n=new RegExp("^("+t.join("|")+")."),i=0,r=this._conditionAnd.length;r>i;i+=1)e=this._conditionAnd[i],e.criteria instanceof o?e.criteria.removePrefixes(t):(e.left_key=e.left_key.replace(n,""),"key"===e.key_type&&(e.right_key[0]=e.right_key[0].replace(n,"")));for(i=0,r=this._conditionOr.length;r>i;i+=1)e=this._conditionOr[i],e.criteria instanceof o?e.criteria.removePrefixes(t):(e.left_key=e.left_key.replace(n,""),"key"===e.key_type&&(e.right_key[0]=e.right_key[0].replace(n,"")));return this},t.Kriteria=o}((0,eval)("this").window||this);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* Kriteria.js */
+
+(function(cxt, global) {
+  "use strict";
+
+  var getProperty = require("./lib/getProperty.js").getProperty,
+      matchPrefix = require("./lib/matchPrefix.js").matchPrefix,
+      Condition = require("./lib/Condition.js").Condition,
+      evaluation = require("./lib/evaluation.js").evaluation;
+
+  /**
+  * @public
+  * @class
+  */
+  var Kriteria = function Kriteria() {
+    this._conditionAnd = [];
+    this._conditionOr = [];
+    this._not_flg = false;
+  };
+  Kriteria._name_ = "Kriteria";
+
+  /**
+  * @public
+  * @function
+  * @returns {Condition[]}
+  */
+  Kriteria.prototype.getConditionAnd = function getConditionAnd() {
+    return this._conditionAnd;
+  };
+
+  /**
+  * @public
+  * @function
+  * @returns {Condition[]}
+  */
+  Kriteria.prototype.getConditionOr = function getConditionAOr() {
+    return this._conditionOr;
+  };
+
+  /**
+  * @private
+  * @property
+  * @description
+  */
+  Kriteria._JS_OPERATOR = {
+    eq: "===",
+    ne: "!==",
+    lt: "<",
+    le: "<=",
+    gt: ">",
+    ge: ">="
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Condition} condition -
+  * @returns {void}
+  * @description
+  */
+  Kriteria.prototype.addAnd = function addAnd(condition) {
+    this._conditionAnd[this._conditionAnd.length] = condition;
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Condition} condition -
+  * @returns {void}
+  * @description
+  */
+  Kriteria.prototype.addOr = function addOr(condition) {
+    this._conditionOr[this._conditionOr.length] = condition;
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Mixed(String|Kriteria|Function)} key - key name or Kriteria instance or Kriteria reqired function
+  * @returns {Function} evaluation || {Kriteria}
+  * @description
+  */
+  Kriteria.prototype.and = function and(key) {
+    var key_type = typeof key,
+        cri = null;
+
+    if(
+      key_type === "string" ||
+      key instanceof String ||
+      key_type === "number" ||
+      key instanceof Number
+    ) {
+      return evaluation("and", key, this);
+
+    } else if(key instanceof Kriteria) {
+      cri = key;
+      this.addAnd(new Condition("", "", [], "", cri));
+
+      return this;
+
+    } else if(typeof key === "function") {
+      cri = new Kriteria();
+      key(cri);
+      this.addAnd(new Condition("", "", [], "", cri));
+
+      return this;
+
+    } else {
+      throw new Error("invalid type of argument. (" + key_type + ")");
+    }
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Mixed(String|Kriteria|Function)} key - key name or Kriteria instance or Kriteria reqired function
+  * @returns {Mixed(Function|Kriteria)}
+  * @description
+  */
+  Kriteria.prototype.or = function or(key) {
+    var key_type = typeof key,
+        cri = null;
+
+    if(key_type === "string" ||
+       key instanceof String ||
+       key_type === "number" ||
+       key instanceof Number
+      ) {
+      return evaluation("or", key, this);
+
+    } else if(key instanceof Kriteria) {
+      cri = key;
+      this.addOr(new Condition("", "", [], "", cri));
+
+      return this;
+
+    } else if(typeof key === "function") {
+      cri = new Kriteria();
+      key(cri);
+      this.addOr(new Condition("", "", [], "", cri));
+
+      return this;
+
+    } else {
+      throw new Error("invalid type of argument. (" + key_type + ")");
+    }
+  };
+
+  /**
+  * @public
+  * @function
+  * @returns {Kriteria}
+  * @description
+  */
+  Kriteria.prototype.not = function not() {
+    this._not_flg = !this._not_flg;
+
+    return this;
+  };
+
+  /**
+  * @public
+  * @static
+  * @function
+  * @param {Object} conditions -
+  *   {Condition[]} conditions.and -
+  *   {Condition[]} conditions.or -
+  * @returns {Kriteria}
+  * @description
+  */
+  Kriteria.parse = function parse(conditions) {
+    var ret = new Kriteria(),
+        i = "";
+
+    for(i in conditions.and) {
+      ret.addAnd(conditions.and[i]);
+    }
+    for(i in conditions.or) {
+      ret.andOr(conditions.or[i]);
+    }
+    if(conditions.not) {
+      ret.not();
+    }
+
+    return ret;
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Object} data -
+  * @returns {Boolean}
+  * @description
+  */
+  Kriteria.prototype.match = function match(data) {
+    var i = 0, l = 0,
+        j = 0, l2 = 0,
+        left_key = "",
+        operator = "",
+        right_key = [],
+        key_type = "",
+        left_value = null,
+        right_value = [],
+        result = false,
+        condition = null,
+        tmp_right_value = null;
+
+    for(i = 0, l = this._conditionAnd.length; i < l; i = i + 1) {
+      condition = this._conditionAnd[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        result = condition.criteria.match(data);
+
+        // and条件は1つでもfalseがあったら、結果はfalse
+        if(!result) {
+          break;
+        }
+
+      } else {
+        left_key = condition.left_key;
+        operator = condition.operator;
+        right_key = condition.right_key;
+        key_type = condition.key_type;
+        left_value = getProperty(data, left_key);
+
+        if(key_type === "value") {
+          right_value = right_key;
+
+        } else if(key_type === "key") {
+          tmp_right_value = getProperty(data, right_key[0]);
+
+          if(Array.isArray(tmp_right_value)) {
+            if(operator === "match" || operator === "not_match") {
+              right_value = [];
+
+              for(j = 0, l2 = tmp_right_value.length; j < l2; j = j + 1) {
+                if(tmp_right_value[j] === null
+                   || tmp_right_value[j] === void 0
+                   || tmp_right_value[j] === "") {
+                  right_value[j] = tmp_right_value[j];
+
+                } else {
+                  right_value[j] = new RegExp(tmp_right_value[j]);
+                }
+              }
+
+            } else {
+              right_value = tmp_right_value;
+            }
+
+          } else {
+            if(operator === "match" || operator === "not_match") {
+              if(tmp_right_value === null
+                 || tmp_right_value === void 0
+                 || tmp_right_value === "") {
+                right_value = tmp_right_value;
+
+              } else {
+                right_value = [new RegExp(tmp_right_value)];
+              }
+
+            } else {
+              right_value = [tmp_right_value];
+            }
+          }
+        }
+
+        if(
+          right_value === void 0
+          || !!~right_value.indexOf(void 0)
+          || left_value === void 0
+        ) {
+          // valueがundefinedの場合はfalse
+          result = false;
+
+        } else {
+          // 上記以外は比較演算
+          result = this._compare(left_value, operator, right_value);
+        }
+
+        // and条件は1つでもfalseがあったら、結果はfalse
+        if(!result) {
+          break;
+        }
+      }
+    }
+
+    // and条件ですべて一致した場合
+    if(result) {
+      return !!(true ^ this._not_flg);
+    }
+
+    for(i = 0, l = this._conditionOr.length; i < l; i = i + 1) {
+      condition = this._conditionOr[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        result = condition.criteria.match(data);
+        if(result) {
+          return !!(true ^ this._not_flg);
+        }
+
+      } else {
+        left_key = condition.left_key;
+        operator = condition.operator;
+        right_key = condition.right_key;
+        key_type = condition.key_type;
+        left_value = getProperty(data, left_key);
+
+        if(key_type === "value") {
+          right_value = right_key;
+
+        } else if(key_type === "key") {
+          tmp_right_value = getProperty(data, right_key[0]);
+
+          if(Array.isArray(tmp_right_value)) {
+            if(operator === "match" || operator === "not_match") {
+              right_value = [];
+
+              for(j = 0, l2 = tmp_right_value.length; j < l2; j = j + 1) {
+                if(tmp_right_value[j] === null
+                   || tmp_right_value[j] === void 0
+                   || tmp_right_value[j] === "") {
+                  right_value[j] = tmp_right_value[j];
+
+                } else {
+                  right_value[j] = new RegExp(tmp_right_value[j]);
+                }
+              }
+
+            } else {
+              right_value = tmp_right_value;
+            }
+          } else {
+            if(operator === "match" || operator === "not_match") {
+              if(tmp_right_value === null
+                 || tmp_right_value === void 0
+                 || tmp_right_value !== "") {
+                right_value = tmp_right_value;
+
+              } else {
+                right_value = [new RegExp(tmp_right_value)];
+              }
+
+            } else {
+              right_value = [tmp_right_value];
+            }
+          }
+        }
+
+        if(
+          right_value === void 0
+          || !!~right_value.indexOf(void 0)
+          || left_value === void 0
+        ) {
+          // valueがundefinedの場合はfalse
+          result = false;
+
+        } else {
+          // 上記以外は比較演算
+          result = this._compare(left_value, operator, right_value);
+        }
+
+        // or条件は1つでもtrueがあったら、結果はtrue
+        if(result) {
+          return !!(true ^ this._not_flg);
+        }
+      }
+    }
+
+    // 上記以外はfalse
+    return !!(false ^ this._not_flg);
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {Mixed(String|Number)} value1 -
+  * @param {String} operator -
+  * @param {Array} value2 -
+  * @returns {Boolean}
+  * @description
+  */
+  Kriteria.prototype._compare = function _compare(value1, operator, value2) {
+    var result = false;
+
+    switch(operator) {
+      case "eq":
+        result = (value2[0] === value1);
+        break;
+
+      case "ne":
+        result = (value2[0] !== value1);
+        break;
+
+      case "lt":
+        result = (value2[0] > value1);
+        break;
+
+      case "le":
+        result = (value2[0] >= value1);
+        break;
+
+      case "gt":
+        result = (value2[0] < value1);
+        break;
+
+      case "ge":
+        result = (value2[0] <= value1);
+        break;
+
+      case "in":
+        result = !!~value2.indexOf(value1);
+        break;
+
+      case "not_in":
+        result = !~value2.indexOf(value1);
+        break;
+
+      case "between":
+        result = (value2[0] <= value1 && value2[1] >= value1);
+        break;
+
+      case "not_between":
+        result = (value2[0] > value1 || value2[1] < value1);
+        break;
+
+      case "match":
+        if(value2[0] === null) {
+          if(value1 === null || value1 === void 0) {
+            result = true;
+          } else {
+            result = false;
+          }
+
+        } else if(value1 === null) {
+          result = false;
+
+        } else if(value2[0] === "") {
+          result = value1 === "" ? true : false;
+
+        } else {
+          result = value2[0].test(value1);
+        }
+        break;
+
+      case "not_match":
+        if(value2[0] === null) {
+          if(value1 === null || value1 === void 0) {
+            result = false;
+          } else {
+            result = true;
+          }
+
+        } else if(value1 === null) {
+          result = true;
+
+        } else if(value2[0] === "") {
+          result = value1 === "" ? false : true;
+
+        } else {
+          result = !value2[0].test(value1);
+        }
+        break;
+    }
+
+    return result;
+  };
+
+  /**
+  * @public
+  * @function
+  * @returns {Function}
+  * @description
+  */
+  Kriteria.prototype.matcher = function matcher() {
+    /* eslint no-new-func: 0 */
+    return new Function("$", "return " + this._createMatchingExpression());
+  };
+
+  /**
+  * @private
+  * @function
+  * @returns {String}
+  * @description
+  */
+  Kriteria.prototype._createMatchingExpression = function _createMatchingExpression() {
+    var i = 0, l = 0,
+        expAnd = [],
+        expOr = [],
+        retAnd = "",
+        retOr = "",
+        condition = null,
+        ret = "";
+
+    for(i = 0, l = this._conditionAnd.length; i < l; i = i + 1) {
+      condition = this._conditionAnd[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        expAnd[expAnd.length] = "(" + condition.criteria._createMatchingExpression() + ")";
+
+      } else {
+        expAnd[expAnd.length] = this._createExpression(condition);
+      }
+    }
+
+    for(i = 0, l = this._conditionOr.length; i < l; i = i + 1) {
+      condition = this._conditionOr[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        expOr[expOr.length] = "(" + condition.criteria._createMatchingExpression() + ")";
+
+      } else {
+        expOr[expOr.length] = this._createExpression(condition);
+      }
+    }
+
+    retAnd = expAnd.join(" && ");
+    retOr = expOr.join(" || ");
+
+    if(retAnd && retOr) {
+      ret = retAnd + " || " + retOr + " ";
+    } else if(!retOr) {
+      ret = retAnd;
+    } else if(!retAnd) {
+      ret = retOr;
+    }
+
+    if(this._not_flg) {
+      ret = "!(" + ret + ")";
+    }
+
+    return ret;
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {Condition} condition -
+  * @returns {String}
+  * @description
+  */
+  Kriteria.prototype._createExpression = function _createExpression(condition) {
+    return "(" +
+      this._createJsExpressionOfKeyIsNotUndefined(condition.left_key) +
+      " && " +
+      (
+        condition.key_type === "key" ?
+          this._createJsExpressionOfKeyIsNotUndefined(condition.right_key[0]) + " && " :
+          ""
+      ) +
+      this._createJsExpression(condition) +
+      ")";
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {Condition}
+  * @returns {String}
+  * @description
+  */
+  Kriteria.prototype._createJsExpression = function _createJsExpression(condition) {
+    var left_key = "$." + condition.left_key,
+        operator = condition.operator,
+        right_key = condition.right_key,
+        key_type = condition.key_type,
+        _operator = Kriteria._JS_OPERATOR[operator];
+
+    if(_operator) {
+      /* 演算子が eq, ne, lt, le, gt, ge のいずれか
+           [left_key] [operator] "[right_key]"
+           [left_key] [operator] $.[right_key]
+      */
+      return left_key + " " + _operator + " " +
+             this._toStringExpressionFromValue(right_key[0], key_type);
+
+    } else if(operator === "in") {
+      /* in 演算子
+           !!~[[right_key]].indexOf([left_key])
+           (Array.isArray($.[right_key]) ? !!~$.[right_key].indexOf([left_key]) : $.[right_key] === [left_key])
+      */
+      if(key_type === "value") {
+        return "!!~" + this._toStringExpressionFromArray(right_key) + ".indexOf(" + left_key + ")";
+
+      } else {
+        return "(Array.isArray($." + right_key[0] + ") ? " +
+               "!!~$." + right_key[0] + ".indexOf(" + left_key + "): " +
+               "$." + right_key[0] + " === " + left_key + ")";
+      }
+
+    } else if(operator === "not_in") {
+      /* not_in 演算子
+      */
+      if(key_type === "value") {
+        return "!~" + this._toStringExpressionFromArray(right_key) + ".indexOf(" + left_key + ")";
+
+      } else {
+        return "(Array.isArray($." + right_key[0] + ") ? " +
+               "!~$." + right_key[0] + ".indexOf(" + left_key + "): " +
+               "$." + right_key[0] + " !== " + left_key + ")";
+      }
+
+    } else if(operator === "between") {
+      /* between 演算子
+      */
+      return left_key + " >= " + this._toStringExpressionFromValue(right_key[0], key_type) +
+             " && " +
+             left_key + " <= " + this._toStringExpressionFromValue(right_key[1], key_type);
+
+    } else if(operator === "not_between") {
+      /* not_between 演算子
+      */
+      return left_key + " < " + this._toStringExpressionFromValue(right_key[0], key_type) +
+             " || " +
+             left_key + " > " + this._toStringExpressionFromValue(right_key[1], key_type);
+
+    } else if(operator === "match") {
+      /* match 演算子
+      */
+      if(right_key[0] === void 0) {
+        return false;
+
+      } else if(right_key[0] === null) {
+        return "(" + left_key + " === null ? true : false)";
+
+      } else if(right_key[0] === "") {
+        return "(" + left_key + " === '' ? true : false)";
+
+      } else {
+        //return "(" + left_key + " !== null && " + right_key[0] + ".test(" + left_key + "))";
+        return "(" + right_key[0] + ".test(" + left_key + "))";
+      }
+
+    } else if(operator === "not_match") {
+      /* not_match 演算子
+      */
+      if(right_key[0] === void 0) {
+        return false;
+
+      } else if(right_key[0] === null) {
+        return "(" + left_key + " === null ? false : true)";
+
+      } else if(right_key[0] === "") {
+        return "(" + left_key + " === '' ? false : true)";
+
+      } else {
+        //return "(" + left_key + " !== null && !" + right_key[0] + ".test(" + left_key + "))";
+        return "(!" + right_key[0] + ".test(" + left_key + "))";
+      }
+
+    } else {
+      return null;
+    }
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {String} key -
+  * @returns {String}
+  * @description
+  */
+  Kriteria.prototype._createJsExpressionOfKeyIsNotUndefined =
+    function _createJsExpressionOfKeyIsNotUndefined(key) {
+    var keys = key.split("."),
+        work_keys = [],
+        ret = [];
+
+    for(var i = 0, l = keys.length; i < l; i = i + 1) {
+      work_keys[work_keys.length] = keys[i];
+      ret[ret.length] = "$." + work_keys.join(".") + " !== void 0";
+    }
+
+    return ret.join(" && ");
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {String} key -
+  * @returns {String}
+  * @description
+  */
+  Kriteria.prototype._createJSExpressionOfKeyIsUndefined =
+    function _createJSExpressionOfKeyIsUndefined(key) {
+    var keys = key.split("."),
+        work_keys = [],
+        ret = [];
+
+    for(var i = 0, l = keys.length; i < l; i = i + 1) {
+      work_keys[work_keys.length] = keys[i];
+      ret[ret.length] = "$." + work_keys.join(".") + " === void 0";
+      ret[ret.length] = "$." + work_keys.join(".") + " === null";
+    }
+
+    return ret.join(" || ");
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {Array} arr -
+  * @returns {String}
+  * @description
+  */
+  Kriteria.prototype._toStringExpressionFromArray = function _toStringExpressionFromArray(arr) {
+    var ret = [];
+
+    for(var i = 0, l = arr.length; i < l; i = i + 1) {
+      ret[ret.length] = this._toStringExpressionFromValue(arr[i], "value");
+    }
+
+    return "[" + ret.join(", ") + "]";
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {Mixed(String|Number)} value -
+  * @param {String} type -
+  * @returns {String}
+  * @description
+  */
+  Kriteria.prototype._toStringExpressionFromValue =
+    function _toStringExpressionFromValue(value, type) {
+    if(type === "value" && (typeof value === "string" || value instanceof String)) {
+      return '"' + value + '"';
+    } else if(type === "key") {
+      return "$." + value;
+    } else {
+      return value + '';
+    }
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {String[]} prefixes -
+  * @returns {Object.<Kriteria>}
+  */
+  Kriteria.prototype.splitByKeyPrefixes = function splitByKeyPrefixes(prefixes) {
+    if(!Array.isArray(prefixes) || prefixes.length === 0) {
+      return null;
+    }
+
+    var ret = {},
+        condition = null,
+        splited_criteria = null,
+        matchPrefixes = [],
+        left_key = "",
+        right_key = "",
+        key_type = "",
+        match1 = true,
+        match2 = true,
+        added = true,
+        key = "",
+        i = 0, l = 0,
+        j = 0, l2 = 0;
+
+    for(i = 0, l = prefixes.length; i < l; i = i + 1) {
+      ret[prefixes[i]] = new Kriteria();
+    }
+    ret.else = new Kriteria();
+
+    for(i = 0, l = this._conditionAnd.length; i < l; i = i + 1) {
+      condition = this._conditionAnd[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        splited_criteria = condition.criteria.splitByKeyPrefixes(prefixes);
+
+        for(key in splited_criteria) {
+          if(splited_criteria[key] !== null) {
+            ret[key].and(splited_criteria[key]);
+          }
+        }
+
+      } else {
+        matchPrefixes = [];
+        left_key = condition.left_key;
+        right_key = condition.right_key[0];
+        key_type = condition.key_type;
+        added = false;
+
+        for(j = 0, l2 = prefixes.length; j < l2; j = j + 1) {
+          matchPrefixes[matchPrefixes.length] = prefixes[j];
+
+          match1 = matchPrefix(left_key, matchPrefixes);
+          if(key_type === "key") {
+            match2 = matchPrefix(right_key, matchPrefixes);
+          }
+
+          if(
+            (key_type === "value" && match1) ||
+            (key_type === "key" && match1 && match2)
+          ) {
+            ret[prefixes[j]].addAnd(condition);
+            added = true;
+            break;
+          }
+        }
+
+        if(!added) {
+          ret.else.addAnd(condition);
+        }
+      }
+    }
+
+    for(i = 0, l = this._conditionOr.length; i < l; i = i + 1) {
+      condition = this._conditionOr[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        splited_criteria = condition.criteria.splitByKeyPrefixes(prefixes);
+
+        for(key in splited_criteria) {
+          if(splited_criteria[key] !== null) {
+            ret[key].or(splited_criteria[key]);
+          }
+        }
+
+      } else {
+        matchPrefixes = [];
+        left_key = condition.left_key;
+        right_key = condition.right_key[0];
+        key_type = condition.key_type;
+        added = false;
+
+        for(j = 0, l2 = prefixes.length; j < l2; j = j + 1) {
+          matchPrefixes[matchPrefixes.length] = prefixes[j];
+
+          match1 = matchPrefix(left_key, matchPrefixes);
+          if(key_type === "key") {
+            match2 = matchPrefix(right_key, matchPrefixes);
+          }
+
+          if(
+            (key_type === "value" && match1) ||
+            (key_type === "key" && match1 && match2)
+          ) {
+            ret[prefixes[j]].addOr(condition);
+            added = true;
+            break;
+          }
+        }
+
+        if(!added) {
+          ret.else.addOr(condition);
+        }
+      }
+    }
+
+    for(key in ret) {
+      if(ret[key].getConditionAnd().length > 0 || ret[key].getConditionOr().length > 0) {
+        ret[key]._not_flg = this._not_flg;
+      } else {
+        ret[key] = null;
+      }
+    }
+    return ret;
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Kriteria} kri -
+  * @param {Boolean} unique -
+  * @returns {Kriteria}
+  */
+  Kriteria.prototype.merge = function merge(kri, unique) {
+    var new_kriteria = new Kriteria(),
+        kri_cond_and = kri.getConditionAnd(),
+        kri_cond_or = kri.getConditionOr(),
+        cond1 = null,
+        match = false,
+        i = 0, l = 0,
+        j = 0, l2 = 0;
+
+    if(this._not_flg !== kri._not_flg) {
+      throw new Error("Kriteria#merge - collision to not flag.");
+    }
+
+    for(i = 0, l = this._conditionAnd.length; i < l; i = i + 1) {
+      new_kriteria.addAnd(this._conditionAnd[i]);
+    }
+
+    for(i = 0, l = this._conditionOr.length; i < l; i = i + 1) {
+      new_kriteria.addOr(this._conditionOr[i]);
+    }
+
+    if(!unique) {
+      for(i = 0, l = kri_cond_and.length; i < l; i = i + 1) {
+        new_kriteria.addAnd(kri_cond_and[i]);
+      }
+
+      for(i = 0, l = kri_cond_or.length; i < l; i = i + 1) {
+        new_kriteria.addOr(kri_cond_or[i]);
+      }
+
+    } else {
+      for(i = 0, l = kri_cond_and.length; i < l; i = i + 1) {
+        cond1 = kri_cond_and[i];
+        match = false;
+
+        for(j = 0, l2 = this._conditionAnd.length; j < l2; j = j + 1) {
+          if(cond1.compareTo(this._conditionAnd[j]) === 0) {
+            match = true;
+            break;
+          }
+        }
+
+        if(!match) {
+          new_kriteria.addAnd(cond1);
+        }
+      }
+
+      for(i = 0, l = kri_cond_or.length; i < l; i = i + 1) {
+        cond1 = kri_cond_or[i];
+        match = false;
+
+        for(j = 0, l2 = this._conditionOr.length; j < l2; j = j + 1) {
+          if(cond1.compareTo(this._conditionOr[j]) === 0) {
+            match = true;
+            break;
+          }
+        }
+
+        if(!match) {
+          new_kriteria.addOr(cond1);
+        }
+      }
+    }
+
+    return new_kriteria;
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Kriteria} kri -
+  * @returns {Number}
+  *    0 - equal
+  *    1 - greater
+  *   -1 - less
+  */
+  Kriteria.prototype.compareTo = function compareTo(kri) {
+    var sort_func = function(a, b) {
+          return a.compareTo(b);
+        },
+        kri_cond_and = kri.getConditionAnd(),
+        kri_cond_or = kri.getConditionOr(),
+        cond1 = null,
+        cond2 = null,
+        compared = true,
+        len1 = 0, len2 = 0,
+        i = 0, l = 0;
+
+    this._conditionAnd.sort(sort_func);
+    kri_cond_and.sort(sort_func);
+    this._conditionOr.sort(sort_func);
+    kri_cond_or.sort(sort_func);
+
+    if(this._not_flg && !kri._not_flg) {
+      return -1;
+    } else if(!this._not_flg && kri._not_flg) {
+      return 1;
+    }
+
+    len1 = this._conditionAnd.length;
+    len2 = kri_cond_and.length;
+    l = len1 > len2 ? len1 : len2;
+    for(i = 0; i < l; i = i + 1) {
+      cond1 = this._conditionAnd[i];
+      cond2 = kri_cond_and[i];
+
+      if(!cond1) {
+        return -1;
+      } else if(!cond2) {
+        return 1;
+      }
+
+      compared = cond1.compareTo(cond2);
+
+      if(compared !== 0) {
+        return compared;
+      }
+    }
+
+    len1 = this._conditionOr.length;
+    len2 = kri_cond_or.length;
+    l = len1 > len2 ? len1 : len2;
+    for(i = 0; i < l; i = i + 1) {
+      cond1 = this._conditionOr[i];
+      cond2 = kri_cond_or[i];
+
+      if(!cond1) {
+        return -1;
+      } else if(!cond2) {
+        return 1;
+      }
+
+      compared = cond1.compareTo(cond2);
+
+      if(compared !== 0) {
+        return compared;
+      }
+    }
+
+    return 0;
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {String[]} prefixes -
+  * @returns {Kriteria}
+  */
+  Kriteria.prototype.removePrefixes = function removePrefixes(prefixes) {
+    var rex = null,
+        condition = null,
+        i = 0, l = 0;
+
+    if(prefixes === null || prefixes === void 0 || !Array.isArray(prefixes) || prefixes.length === 0) {
+      return this;
+    }
+
+    rex = new RegExp("^(" + prefixes.join("|") + ").");
+
+    for(i = 0, l = this._conditionAnd.length; i < l; i = i + 1) {
+      condition = this._conditionAnd[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        condition.criteria.removePrefixes(prefixes);
+
+      } else {
+        condition.left_key = condition.left_key.replace(rex, "");
+        if(condition.key_type === "key") {
+          condition.right_key[0] = condition.right_key[0].replace(rex, "");
+        }
+      }
+    }
+
+    for(i = 0, l = this._conditionOr.length; i < l; i = i + 1) {
+      condition = this._conditionOr[i];
+
+      if(condition.criteria instanceof Kriteria) {
+        condition.criteria.removePrefixes(prefixes);
+
+      } else {
+        condition.left_key = condition.left_key.replace(rex, "");
+        if(condition.key_type === "key") {
+          condition.right_key[0] = condition.right_key[0].replace(rex, "");
+        }
+      }
+    }
+
+    return this;
+  };
+
+
+  cxt.Kriteria = Kriteria;
+  global.Kriteria = Kriteria;
+
+}(this, (0, eval)("this").window || this));
+
 },{"./lib/Condition.js":2,"./lib/evaluation.js":3,"./lib/getProperty.js":4,"./lib/matchPrefix.js":5}],2:[function(require,module,exports){
-!function(e){"use strict";var t=function(e,t,r,i,h){this.left_key=e,this.operator=t,this.right_key=Array.isArray(r)||void 0===r||null===r?r:[r],this.key_type=i,this.criteria=h};t.prototype.clone=function(){return new t(this.left_key,this.operator,this.right_key.concat(),this.key_type,this.criteria)},t.prototype.not=function(){switch(this.operator){case"eq":this.operator="ne";break;case"ne":this.operator="eq";break;case"lt":this.operator="ge";break;case"le":this.operator="gt";break;case"gt":this.operator="le";break;case"ge":this.operator="lt";break;case"in":this.operator="not_in";break;case"not_in":this.operator="in";break;case"between":this.operator="not_between";break;case"not_between":this.operator="between";break;case"match":this.operator="not_match";break;case"not_match":this.operator="match"}return this},t.prototype.normalize=function(){var e=[],r=0,i=0;if("value"===this.key_type)switch(this.operator){case"in":for(r=0,i=this.right_key.length;i>r;r+=1)e[e.length]=new t(this.left_key,"eq",[this.right_key[r]],this.key_type,null);break;case"not_in":for(r=0,i=this.right_key.length;i>r;r+=1)e[e.length]=new t(this.left_key,"ne",[this.right_key[r]],this.key_type,null);break;case"between":e[e.length]=new t(this.left_key,"ge",[this.right_key[0]],this.key_type,null),e[e.length]=new t(this.left_key,"le",[this.right_key[1]],this.key_type,null);break;case"not_between":e[e.length]=new t(this.left_key,"lt",[this.right_key[0]],this.key_type,null),e[e.length]=new t(this.left_key,"gt",[this.right_key[1]],this.key_type,null);break;default:e[e.length]=this.clone()}else e[e.length]=this.clone();return e},t.prototype.compareTo=function(e){if(this.criteria&&!e.criteria)return 1;if(!this.criteria&&e.criteria)return-1;if(this.criteria&&e.criteria)return this.criteria.compareTo(e.criteria);if(this.left_key>e.left_key)return 1;if(this.left_key<e.left_key)return-1;if(this.operator>e.operator)return 1;if(this.operator<e.operator)return-1;if(this.key_type>e.key_type)return 1;if(this.key_type<e.key_type)return-1;for(var t=0,r=this.right_key.length;r>t;t+=1){if(this.right_key[t]>e.right_key[t])return 1;if(this.right_key[t]<e.right_key[t])return-1}return 0},e.Condition=t}(this);
+/* Condition.js */
+
+(function (cxt) {
+  "use strict";
+
+  /**
+  * @public
+  * @class
+  * @param {String} left_key -
+  * @param {String} operator -
+  * @param {Mixed(Array<any>|any)} right_key -
+  * @param {String} key_type -
+  * @param {Kriteria} criteria
+  * @description
+  */
+  var Condition = function Condition(left_key, operator, right_key, key_type, criteria) {
+    this.left_key = left_key;
+    this.operator = operator;
+    this.right_key = (Array.isArray(right_key) || right_key === void 0 || right_key === null) ?
+      right_key : [right_key];
+    this.key_type = key_type;
+    this.criteria = criteria;
+  };
+
+  /**
+  * @public
+  * @function
+  * @returns {Condition}
+  * @description
+  */
+  Condition.prototype.clone = function clone() {
+    return new Condition(this.left_key, this.operator, this.right_key.concat(), this.key_type, this.criteria);
+  };
+
+  /**
+  * @public
+  * @function
+  * @returns {Conditons}
+  * @description
+  */
+  Condition.prototype.not = function not() {
+    switch(this.operator) {
+      case "eq":
+        this.operator = "ne";
+        break;
+
+      case "ne":
+        this.operator = "eq";
+        break;
+
+      case "lt":
+        this.operator = "ge";
+        break;
+
+      case "le":
+        this.operator = "gt";
+        break;
+
+      case "gt":
+        this.operator = "le";
+        break;
+
+      case "ge":
+        this.operator = "lt";
+        break;
+
+      case "in":
+        this.operator = "not_in";
+        break;
+
+      case "not_in":
+        this.operator = "in";
+        break;
+
+      case "between":
+        this.operator = "not_between";
+        break;
+
+      case "not_between":
+        this.operator = "between";
+        break;
+
+      case "match":
+        this.operator = "not_match";
+        break;
+
+      case "not_match":
+        this.operator = "match";
+        break;
+
+    }
+
+    return this;
+  };
+
+  /**
+  * @public
+  * @function
+  * @returns Array<Condition>
+  */
+  Condition.prototype.normalize = function normalize() {
+    var ret = [],
+        i = 0, l = 0;
+
+    if(this.key_type === "value") {
+      switch(this.operator) {
+        case "in":
+          for(i = 0, l = this.right_key.length; i < l; i = i + 1) {
+            ret[ret.length] = new Condition(
+              this.left_key, "eq", [this.right_key[i]], this.key_type, null)
+            ;
+          }
+          break;
+
+        case "not_in":
+          for(i = 0, l = this.right_key.length; i < l; i = i + 1) {
+            ret[ret.length] = new Condition(
+              this.left_key, "ne", [this.right_key[i]], this.key_type, null
+            );
+          }
+          break;
+
+        case "between":
+          ret[ret.length] = new Condition(
+            this.left_key, "ge", [this.right_key[0]], this.key_type, null
+          );
+          ret[ret.length] = new Condition(
+            this.left_key, "le", [this.right_key[1]], this.key_type, null
+          );
+          break;
+
+        case "not_between":
+          ret[ret.length] = new Condition(
+            this.left_key, "lt", [this.right_key[0]], this.key_type, null
+          );
+          ret[ret.length] = new Condition(
+            this.left_key, "gt", [this.right_key[1]], this.key_type, null
+          );
+          break;
+
+        default:
+          ret[ret.length] = this.clone();
+          break;
+      }
+
+    } else {
+      ret[ret.length] = this.clone();
+    }
+
+    return ret;
+  };
+
+  /**
+  * @public
+  * @function
+  * @param {Condition} cond -
+  * @returns {Number}
+  *    0 - equal
+  *    1 - greater
+  *   -1 - less
+  */
+  Condition.prototype.compareTo = function compareTo(cond) {
+    if(this.criteria && !cond.criteria) {
+      return 1;
+
+    } else if(!this.criteria && cond.criteria) {
+      return -1;
+
+    } else if(this.criteria && cond.criteria) {
+      return this.criteria.compareTo(cond.criteria);
+
+    } else if(this.left_key > cond.left_key) {
+      return 1;
+
+    } else if(this.left_key < cond.left_key) {
+      return -1;
+
+    } else if(this.operator > cond.operator) {
+      return 1;
+
+    } else if(this.operator < cond.operator) {
+      return -1;
+
+    } else if(this.key_type > cond.key_type) {
+      return 1;
+
+    } else if(this.key_type < cond.key_type) {
+      return -1;
+
+    } else {
+      for(var i = 0, l = this.right_key.length; i < l; i = i + 1) {
+        if(this.right_key[i] > cond.right_key[i]) {
+          return 1;
+        } else if(this.right_key[i] < cond.right_key[i]) {
+          return -1;
+        }
+      }
+
+      return 0;
+    }
+  };
+
+  cxt.Condition = Condition;
+
+})(this);
+
 },{}],3:[function(require,module,exports){
-!function(e){"use strict";var n=require("./Condition.js").Condition,t=function(e,n,t){return{eq:{key:function(r){return u(t,e,"eq",n,"key",[r]),t},value:function(r){return u(t,e,"eq",n,"value",[r]),t}},ne:{key:function(r){return u(t,e,"ne",n,"key",[r]),t},value:function(r){return u(t,e,"ne",n,"value",[r]),t}},lt:{key:function(r){return u(t,e,"lt",n,"key",[r]),t},value:function(r){return u(t,e,"lt",n,"value",[r]),t}},le:{key:function(r){return u(t,e,"le",n,"key",[r]),t},value:function(r){return u(t,e,"le",n,"value",[r]),t}},gt:{key:function(r){return u(t,e,"gt",n,"key",[r]),t},value:function(r){return u(t,e,"gt",n,"value",[r]),t}},ge:{key:function(r){return u(t,e,"ge",n,"key",[r]),t},value:function(r){return u(t,e,"ge",n,"value",[r]),t}},"in":{key:function(){return u(t,e,"in",n,"key",[].slice.apply(arguments)),t},value:function(){return u(t,e,"in",n,"value",[].slice.apply(arguments)),t}},not_in:{key:function(){return u(t,e,"not_in",n,"key",[].slice.apply(arguments)),t},value:function(){return u(t,e,"not_in",n,"value",[].slice.apply(arguments)),t}},between:function(r,i){return u(t,e,"between",n,"value",[r,i]),t},not_between:function(r,i){return u(t,e,"not_between",n,"value",[r,i]),t},match:function(r){var i=r instanceof RegExp?r:null===r?null:void 0===r?void 0:""===r?"":new RegExp(r);return u(t,e,"match",n,"value",[i]),t},not_match:function(r){var i=r instanceof RegExp?r:null===r?null:void 0===r?void 0:""===r?"":new RegExp(r);return u(t,e,"not_match",n,"value",[i]),t}}},u=function(e,t,u,r,i,o){if("and"===t.toLowerCase())e.addAnd(new n(r,u,o,i,null));else{if("or"!==t.toLowerCase())throw new Error("invalid type: "+t+"(at key_name:"+r+", key_type: "+i+", operator:"+u+")");e.addOr(new n(r,u,o,i,null))}};e.evaluation=t}(this);
+/* evaluation.js */
+
+(function (cxt){
+  "use strict";
+
+  var Condition = require('./Condition.js').Condition;
+
+  /**
+  * @public
+  * @function
+  * @param {String} type -
+  * @param {String} left_key -
+  * @param {Kriteria} criteria -
+  * @returns {Object<[eq|ne|lt|le|gt|ge|in|not_in].[key|value]>|between}
+  * @description
+  */
+  var evaluation = function evaluation(type, left_key, criteria) {
+    return {
+      eq: {
+        key: function(value) {
+          _setToCriteria(criteria, type, "eq", left_key, "key", [value]);
+          return criteria;
+        },
+        value: function(value) {
+          _setToCriteria(criteria, type, "eq", left_key, "value", [value]);
+          return criteria;
+        }
+      },
+      ne: {
+        key: function(value) {
+          _setToCriteria(criteria, type, "ne", left_key, "key", [value]);
+          return criteria;
+        },
+        value: function(value) {
+          _setToCriteria(criteria, type, "ne", left_key, "value", [value]);
+          return criteria;
+        }
+      },
+      lt: {
+        key: function(value) {
+          _setToCriteria(criteria, type, "lt", left_key, "key", [value]);
+          return criteria;
+        },
+        value: function(value) {
+          _setToCriteria(criteria, type, "lt", left_key, "value", [value]);
+          return criteria;
+        }
+      },
+      le: {
+        key: function(value) {
+          _setToCriteria(criteria, type, "le", left_key, "key", [value]);
+          return criteria;
+        },
+        value: function(value) {
+          _setToCriteria(criteria, type, "le", left_key, "value", [value]);
+          return criteria;
+        }
+      },
+      gt: {
+        key: function(value) {
+          _setToCriteria(criteria, type, "gt", left_key, "key", [value]);
+          return criteria;
+        },
+        value: function(value) {
+          _setToCriteria(criteria, type, "gt", left_key, "value", [value]);
+          return criteria;
+        }
+      },
+      ge: {
+        key: function(value) {
+          _setToCriteria(criteria, type, "ge", left_key, "key", [value]);
+          return criteria;
+        },
+        value: function(value) {
+          _setToCriteria(criteria, type, "ge", left_key, "value", [value]);
+          return criteria;
+        }
+      },
+      in: {
+        key: function() {
+          _setToCriteria(criteria, type, "in", left_key, "key", [arguments[0]]);
+          return criteria;
+        },
+        value: function() {
+          _setToCriteria(
+            criteria,
+            type,
+            "in",
+            left_key,
+            "value",
+            Array.isArray(arguments[0]) ? arguments[0] : [].slice.apply(arguments)
+          );
+          return criteria;
+        }
+      },
+      not_in: {
+        key: function() {
+          _setToCriteria(criteria, type, "not_in", left_key, "key", [arguments[0]]);
+          return criteria;
+        },
+        value: function() {
+          _setToCriteria(
+            criteria,
+            type,
+            "not_in",
+            left_key,
+            "value",
+            Array.isArray(arguments[0]) ? arguments[0] : [].slice.apply(arguments)
+          );
+          return criteria;
+        }
+      },
+      between: function(value1, value2) {
+        _setToCriteria(criteria, type, "between", left_key, "value", [value1, value2]);
+        return criteria;
+      },
+      not_between: function(value1, value2) {
+        _setToCriteria(criteria, type, "not_between", left_key, "value", [value1, value2]);
+        return criteria;
+      },
+      match: function(value) {
+        var _value = value instanceof RegExp ? value :
+                     value === null ? null :
+                     value === void 0 ? void 0 :
+                     value === "" ? "" : new RegExp(value);
+        _setToCriteria(criteria, type, "match", left_key, "value", [_value]);
+        return criteria;
+      },
+      not_match: function(value) {
+        var _value = value instanceof RegExp ? value :
+                     value === null ? null :
+                     value === void 0 ? void 0 :
+                     value === "" ? "" : new RegExp(value);
+        _setToCriteria(criteria, type, "not_match", left_key, "value", [_value]);
+        return criteria;
+      }
+    };
+  };
+
+  /**
+  * @private
+  * @function
+  * @param {Kriteria} criteria -
+  * @param {String} type -
+  * @param {String} operator -
+  * @param {String} key_name -
+  * @param {Array<String>} values -
+  * @returns {void}
+  * @description
+  */
+  var _setToCriteria = function _setToCriteria(criteria, type, operator, key_name, key_type, values) {
+    if(type.toLowerCase() === "and") {
+      criteria.addAnd(new Condition(key_name, operator, values, key_type, null));
+
+    } else if(type.toLowerCase() === "or") {
+      criteria.addOr(new Condition(key_name, operator, values, key_type, null));
+
+    } else {
+      throw new Error(
+        "invalid type: " + type +
+        "(at key_name:" + key_name + ", key_type: " + key_type + ", operator:" + operator + ")"
+      );
+    }
+  };
+
+
+  cxt.evaluation = evaluation;
+
+})(this);
+
 },{"./Condition.js":2}],4:[function(require,module,exports){
-!function(t){"use strict";var n=function(t,n){for(var r=n.split("."),e=t,i=0,f=r.length;f>i;i+=1){if("string"==typeof e||e instanceof String||"number"==typeof e||e instanceof Number)return;if(!(r[i]in e))return;e=e[r[i]]}return e};t.getProperty=n}(this);
+/* getProperty.js */
+
+(function (cxt) {
+  'use strict';
+
+  var getProperty = function getProperty(obj, key) {
+    var keys = key.split('.'),
+        ret = obj;
+
+    for(var i = 0, l = keys.length; i < l; i += 1) {
+      if(
+        typeof ret === "string" ||
+        ret instanceof String ||
+        typeof ret === "number" ||
+        ret instanceof Number
+      ) {
+        return void 0;
+
+      } else if(keys[i] in ret) {
+        ret = ret[keys[i]];
+
+      } else {
+        return void 0;
+      }
+    }
+
+    return ret;
+  };
+
+  cxt.getProperty = getProperty;
+
+})(this);
+
 },{}],5:[function(require,module,exports){
-!function(r){"use strict";var t=function(r,t){if(0===t.length)return!0;for(var n=0,e=t.length;e>n;n+=1)if(0===r.indexOf(t[n]+"."))return!0;return!1};r.matchPrefix=t}(this);
-},{}]},{},[1])
+/* matchPrefix.js */
+
+(function(cxt) {
+  "use strict";
+
+  /**
+  * @public
+  * @function
+  * @param {String} str -
+  * @param {String[]} prefixes -
+  * @returns {Boolean}
+  */
+  var matchPrefix = function matchPrefix(str, prefixes) {
+    if(prefixes.length === 0) {
+      return true;
+    }
+
+    for(var i = 0, l = prefixes.length; i < l; i = i + 1) {
+      if(str.indexOf(prefixes[i] + ".") === 0) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+
+  cxt.matchPrefix = matchPrefix;
+
+}(this));
+
+},{}]},{},[1]);

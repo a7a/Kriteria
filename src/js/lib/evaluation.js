@@ -78,21 +78,35 @@
       },
       in: {
         key: function() {
-          _setToCriteria(criteria, type, "in", left_key, "key", [].slice.apply(arguments));
+          _setToCriteria(criteria, type, "in", left_key, "key", [arguments[0]]);
           return criteria;
         },
         value: function() {
-          _setToCriteria(criteria, type, "in", left_key, "value", [].slice.apply(arguments));
+          _setToCriteria(
+            criteria,
+            type,
+            "in",
+            left_key,
+            "value",
+            Array.isArray(arguments[0]) ? arguments[0] : [].slice.apply(arguments)
+          );
           return criteria;
         }
       },
       not_in: {
         key: function() {
-          _setToCriteria(criteria, type, "not_in", left_key, "key", [].slice.apply(arguments));
+          _setToCriteria(criteria, type, "not_in", left_key, "key", [arguments[0]]);
           return criteria;
         },
         value: function() {
-          _setToCriteria(criteria, type, "not_in", left_key, "value", [].slice.apply(arguments));
+          _setToCriteria(
+            criteria,
+            type,
+            "not_in",
+            left_key,
+            "value",
+            Array.isArray(arguments[0]) ? arguments[0] : [].slice.apply(arguments)
+          );
           return criteria;
         }
       },

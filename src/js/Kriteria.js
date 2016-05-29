@@ -1,10 +1,9 @@
 /* Kriteria.js */
 
-(function(cxt) {
+(function(cxt, global) {
   "use strict";
 
   var getProperty = require("./lib/getProperty.js").getProperty,
-      //samePrefix = require("./lib/samePrefix.js").samePrefix,
       matchPrefix = require("./lib/matchPrefix.js").matchPrefix,
       Condition = require("./lib/Condition.js").Condition,
       evaluation = require("./lib/evaluation.js").evaluation;
@@ -185,130 +184,6 @@
 
     return ret;
   };
-
-  /**
-  * @public
-  * @function
-  * @param {String[]} prefixes -
-  * @param {Number[]} types -
-  *   0 - key-type is value and prefix included
-  *   1 - key-type is key and prefix included
-  *   2 - key-type is key and xor prefix for left and right side
-  *   3 - key-type is key and same prefix for left and right side
-  *   4 - other than prefixes
-  * @returns {Kriteria}
-  */
-//  Kriteria.prototype.createOfConditionWithKeyPrefixes = function createOfConditionWithKeyPrefixes(prefixes, types) {
-//    var new_kriteria = new Kriteria(),
-//        kri = null,
-//        condition = null,
-//        left_key = "",
-//        right_key = [],
-//        key_type = "",
-//        match1 = true,
-//        match2 = true,
-//        _types = [],//(type === void 0 || type === null) ? 0 : +type,
-//        i = 0, l = 0;
-//
-//    if(types === void 0 || types === null) {
-//      _types = [0, 1];
-//
-//    } else if(Array.isArray(types)) {
-//      for(i = 0, l = types.length; i < l; i = i + 1) {
-//        var type = +types[i];
-//
-//        if(Number.isNaN(type)) {
-//          return null;
-//        }
-//        _types[_types.length] = type;
-//      }
-//    }
-//
-//    for(i = 0, l = this._conditionAnd.length; i < l; i = i + 1) {
-//      condition = this._conditionAnd[i];
-//
-//      if(condition.criteria instanceof Kriteria) {
-//        kri = condition.criteria.createOfConditionWithKeyPrefixes(prefixes, _types);
-//
-//        if(kri) {
-//          new_kriteria.addAnd(kri);
-//        }
-//
-//      } else {
-//        left_key = condition.left_key;
-//        right_key = condition.right_key;
-//        key_type = condition.key_type;
-//
-//        match1 = matchPrefix(left_key, prefixes);
-//
-//        if(key_type === "value") {
-//          if(
-//            (!!~_types.indexOf(0) && match1) ||
-//            (!!~_types.indexOf(4) && !match1)
-//          ) {
-//            new_kriteria.addAnd(condition);
-//          }
-//
-//        } else if(key_type === "key") {
-//          match2 = matchPrefix(right_key[0], prefixes);
-//
-//          if(
-//            (!!~_types.indexOf(1) && (match1 || match2)) ||
-//            (!!~_types.indexOf(2) && (match1 ^ match2)) ||
-//            (!!~_types.indexOf(3) && samePrefix(left_key, right_key[0], prefixes)) ||
-//            (!!~_types.indexOf(4) && (!match1 && !match2))
-//          ) {
-//            new_kriteria.addAnd(condition);
-//          }
-//        }
-//      }
-//    }
-//
-//    for(i = 0, l = this._conditionOr.length; i < l; i = i + 1) {
-//      condition = this._conditionOr[i];
-//
-//      if(condition.criteria instanceof Kriteria) {
-//        kri = condition.criteria.createOfConditionWithKeyPrefixes(prefixes, _types);
-//
-//        if(kri) {
-//          new_kriteria.addOr(kri);
-//        }
-//
-//      } else {
-//        left_key = condition.left_key;
-//        right_key = condition.right_key;
-//        key_type = condition.key_type;
-//
-//        match1 = matchPrefix(left_key, prefixes);
-//
-//        if(key_type === "value") {
-//          if(
-//            (!!~_types.indexOf(0) && match1) ||
-//            (!!~_types.indexOf(4) && !match1)
-//          ) {
-//            new_kriteria.addOr(condition);
-//          }
-//
-//        } else if(key_type === "key") {
-//          match2 = matchPrefix(right_key[0], prefixes);
-//
-//          if(
-//            (!!~_types.indexOf(1) && (match1 || match2)) ||
-//            (!!~_types.indexOf(2) && (match1 ^ match2)) ||
-//            (!!~_types.indexOf(3) && samePrefix(left_key, right_key[0], prefixes)) ||
-//            (!!~_types.indexOf(4) && (!match1 && !match2))
-//          ) {
-//            new_kriteria.addOr(condition);
-//          }
-//        }
-//      }
-//    }
-//
-//    new_kriteria._not_flg = this._not_flg;
-//
-//    return new_kriteria.getConditionAnd().length > 0 || new_kriteria.getConditionOr().length > 0 ?
-//      new_kriteria : null;
-//  };
 
   /**
   * @public
@@ -1182,5 +1057,6 @@
 
 
   cxt.Kriteria = Kriteria;
+  global.Kriteria = Kriteria;
 
-})((0, eval)("this").window || this);
+}(this, (0, eval)("this").window || this));
