@@ -6,7 +6,8 @@
   var getProperty = require("./lib/getProperty.js").getProperty,
       matchPrefix = require("./lib/matchPrefix.js").matchPrefix,
       Condition = require("./lib/Condition.js").Condition,
-      evaluation = require("./lib/evaluation.js").evaluation;
+      evaluation = require("./lib/evaluation.js").evaluation,
+      kref = require("./lib/keys_reference.js").keysReference;
 
   /**
   * @public
@@ -560,11 +561,12 @@
   * @description
   */
   Kriteria.prototype._createJsExpression = function _createJsExpression(condition) {
-    var left_key = "$." + condition.left_key,
+    var left_key = kref("$", condition.left_key.split(".")),
         operator = condition.operator,
         right_key = condition.right_key,
         key_type = condition.key_type,
-        _operator = Kriteria._JS_OPERATOR[operator];
+        _operator = Kriteria._JS_OPERATOR[operator],
+        $_right_key = kref("$", right_key[0]).toString();
 
     if(_operator) {
       /* 演算子が eq, ne, lt, le, gt, ge のいずれか
@@ -583,9 +585,9 @@
         return "!!~" + this._toStringExpressionFromArray(right_key) + ".indexOf(" + left_key + ")";
 
       } else {
-        return "(Array.isArray($." + right_key[0] + ") ? " +
-               "!!~$." + right_key[0] + ".indexOf(" + left_key + "): " +
-               "$." + right_key[0] + " === " + left_key + ")";
+        return "(Array.isArray(" + $_right_key + ") ? " +
+               "!!~" + $_right_key + ".indexOf(" + left_key + "): " +
+               $_right_key + " === " + left_key + ")";
       }
 
     } else if(operator === "not_in") {
@@ -595,9 +597,9 @@
         return "!~" + this._toStringExpressionFromArray(right_key) + ".indexOf(" + left_key + ")";
 
       } else {
-        return "(Array.isArray($." + right_key[0] + ") ? " +
-               "!~$." + right_key[0] + ".indexOf(" + left_key + "): " +
-               "$." + right_key[0] + " !== " + left_key + ")";
+        return "(Array.isArray(" + $_right_key + ") ? " +
+               "!~" + $_right_key + ".indexOf(" + left_key + "): " +
+               $_right_key + " !== " + left_key + ")";
       }
 
     } else if(operator === "between") {
@@ -668,7 +670,7 @@
 
     for(var i = 0, l = keys.length; i < l; i = i + 1) {
       work_keys[work_keys.length] = keys[i];
-      ret[ret.length] = "$." + work_keys.join(".") + " !== void 0";
+      ret[ret.length] = kref("$", work_keys).toString() + " !== void 0";
     }
 
     return ret.join(" && ");
@@ -689,8 +691,11 @@
 
     for(var i = 0, l = keys.length; i < l; i = i + 1) {
       work_keys[work_keys.length] = keys[i];
-      ret[ret.length] = "$." + work_keys.join(".") + " === void 0";
-      ret[ret.length] = "$." + work_keys.join(".") + " === null";
+
+      var $_work_keys = kref("$", work_keys);
+
+      ret[ret.length] = $_work_keys + " === void 0";
+      ret[ret.length] = $_work_keys + " === null";
     }
 
     return ret.join(" || ");
@@ -725,8 +730,10 @@
     function _toStringExpressionFromValue(value, type) {
     if(type === "value" && (typeof value === "string" || value instanceof String)) {
       return '"' + value + '"';
+
     } else if(type === "key") {
-      return "$." + value;
+      return kref("$", value.split(".")).toString();
+
     } else {
       return value + '';
     }
